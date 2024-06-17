@@ -1,12 +1,14 @@
 // pages/login/login_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:page2/dashboard/dashboard.dart';
 import 'package:page2/login/login_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final String? ipmaquina;
+  const LoginPage({super.key, this.ipmaquina});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -16,25 +18,31 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  late final String ipmaquina;
 
   @override
+  void initState() {
+    super.initState();
+    ipmaquina = widget.ipmaquina!;
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               Image.asset(
                 'assets/logo.jpeg',
-                height: 160.0,
-                width: 160.0,
+                height: 120.0,
+                width: 120.0,
               ), // Ajusta el tamaño según tus necesidades
               const SizedBox(height: 30.0),
-              const Text(
-                'INICIA SESIÓN EN TU CUENTA',
+              Text(
+                'INICIA SESIÓN EN TU CUENTA \n CONEXION A: \t $ipmaquina',
                 style: TextStyle(
                   fontSize: 24.0, // Tamaño de fuente más grande
                   fontWeight: FontWeight.bold, // Texto en negrita
@@ -83,10 +91,19 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Iniciar sesión con los datos ingresados
-                    final loginProvider = Provider.of<LoginProvider>(context);
+                    // Access provider with listen: false
+                    final ipText = ipmaquina;
+                    final loginProvider =
+                        Provider.of<LoginProvider>(context, listen: false);
                     loginProvider.login(
                         _emailController.text, _passwordController.text);
+
+                    // Navigate to SuccessWidget
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FileApp(ipmaquina: ipText)),
+                    );
                   }
                 },
                 style: ButtonStyle(
